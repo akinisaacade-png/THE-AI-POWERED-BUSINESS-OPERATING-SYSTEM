@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Sidebar } from "./components/Sidebar";
 import { Header } from "./components/Header";
 import { GlobalSearchModal } from "./components/GlobalSearchModal";
@@ -10,6 +10,8 @@ import { GeminiChatbotWidget } from "./components/GeminiChatbotWidget";
 import { KeyboardShortcutsModal } from "./components/KeyboardShortcutsModal";
 import { SubscriptionBanner } from "./components/SubscriptionBanner";
 import { SubscriptionGuard } from "./components/SubscriptionGuard";
+import { ToastContainer } from "./components/ToastContainer";
+import { useToast } from "./context/ToastContext";
 import {
   saveDealToFirestore,
   deleteDealFromFirestore,
@@ -79,9 +81,14 @@ export default function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [aiMode, setAiMode] = useState<"flash-lite" | "thinking" | "standard">("flash-lite");
 
+  // Real-time Toast Notifications
+  const { notifyNewLead, notifyDealStageChanged, notifyNewDeal } = useToast();
+
   // Global State for all modules
   const [contacts, setContacts] = useState<Contact[]>(initialContacts);
   const [deals, setDeals] = useState<Deal[]>(initialDeals);
+  const prevDealsRef = useRef<Deal[]>(initialDeals);
+  const isInitialLoadRef = useRef(true);
   const [calls, setCalls] = useState<CallLog[]>(initialCalls);
   const [bookings, setBookings] = useState<Booking[]>(initialBookings);
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
@@ -166,36 +173,83 @@ export default function App() {
     }
   }, [darkMode]);
 
-  // Subscribe to real-time Deals from Firestore
+  // Subscribe to real-time Deals from Firestore with Real-Time Alerts
   useEffect(() => {
     const unsubscribe = subscribeToDeals((remoteDeals) => {
       if (remoteDeals && remoteDeals.length > 0) {
+        if (!isInitialLoadRef.current) {
+          // Check for remote stage transitions or new deals in real-time
+          remoteDeals.forEach((remoteDeal) => {
+            const localDeal = prevDealsRef.current.find((d) => d.id === remoteDeal.id);
+            if (!localDeal) {
+              // Remote deal arrived
+              notifyNewDeal(remoteDeal, () => setActiveTab("crm-pipeline"));
+            } else if (localDeal.stage !== remoteDeal.stage) {
+              // Remote deal stage changed
+              notifyDealStageChanged(
+                remoteDeal,
+                localDeal.stage,
+                remoteDeal.stage,
+                () => setActiveTab("crm-pipeline")
+              );
+            }
+          });
+        } else {
+          isInitialLoadRef.current = false;
+        }
+
+        prevDealsRef.current = remoteDeals;
         setDeals(remoteDeals);
       }
     });
     return () => {
       if (typeof unsubscribe === "function") unsubscribe();
     };
-  }, []);
+  }, [notifyDealStageChanged, notifyNewDeal]);
 
-  // Entity Handlers with Firestore Cloud Sync
-  const handleAddContact = (newC: Contact) => setContacts((prev) => [newC, ...prev]);
+  // Entity Handlers with Firestore Cloud Sync & Real-Time Alerts
+  const handleAddContact = (newC: Contact) => {
+    setContacts((prev) => [newC, ...prev]);
+    notifyNewLead(newC, () => setActiveTab("contacts"));
+  };
   const handleDeleteContact = (id: string) => setContacts((prev) => prev.filter((c) => c.id !== id));
 
   const handleAddDeal = (newD: Deal) => {
-    setDeals((prev) => [newD, ...prev]);
+    setDeals((prev) => {
+      prevDealsRef.current = [newD, ...prev];
+      return [newD, ...prev];
+    });
     saveDealToFirestore(newD);
+    notifyNewDeal(newD, () => setActiveTab("crm-pipeline"));
   };
+
   const handleUpdateDeal = (dealId: string, updates: Partial<Deal>) => {
     setDeals((prev) => {
+      const existingDeal = prev.find((d) => d.id === dealId);
       const updatedList = prev.map((d) => (d.id === dealId ? { ...d, ...updates } : d));
       const target = updatedList.find((d) => d.id === dealId);
-      if (target) saveDealToFirestore(target);
+
+      if (target) {
+        saveDealToFirestore(target);
+        if (updates.stage && existingDeal && updates.stage !== existingDeal.stage) {
+          notifyDealStageChanged(
+            target,
+            existingDeal.stage,
+            updates.stage,
+            () => setActiveTab("crm-pipeline")
+          );
+        }
+      }
+      prevDealsRef.current = updatedList;
       return updatedList;
     });
   };
   const handleDeleteDeal = (id: string) => {
-    setDeals((prev) => prev.filter((d) => d.id !== id));
+    setDeals((prev) => {
+      const filtered = prev.filter((d) => d.id !== id);
+      prevDealsRef.current = filtered;
+      return filtered;
+    });
     deleteDealFromFirestore(id);
   };
 
@@ -660,6 +714,9 @@ export default function App() {
         }}
         darkMode={darkMode}
       />
+
+      {/* Global Real-Time Toast Notifications (Leads, Deal Stage Changes, Alerts) */}
+      <ToastContainer />
     </div>
   );
 }

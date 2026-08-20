@@ -220,7 +220,48 @@ export const ContactsPage: React.FC<ContactsPageProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={() => {
+              const idSuffix = Date.now().toString().slice(-4);
+              const sampleCompanies = ["Apex Cloud Systems", "Starlight Health AI", "HyperScale Logistics", "Quantum Retail Labs"];
+              const sampleNames = ["Elena Rostova", "Marcus Vance", "Sophia Chen", "Derrick Sterling"];
+              const randomIdx = Math.floor(Math.random() * sampleNames.length);
+
+              const simulatedContact: Contact = {
+                id: `cnt-live-${idSuffix}`,
+                name: sampleNames[randomIdx],
+                email: `${sampleNames[randomIdx].toLowerCase().replace(" ", ".")}@${sampleCompanies[randomIdx].toLowerCase().replace(/\s+/g, "")}.io`,
+                phone: `+1 (555) 492-${idSuffix}`,
+                company_name: sampleCompanies[randomIdx],
+                tags: ["High-Intent", "Live Webhook", "AI Scored"],
+                source: "Website AI Inbound Chat",
+                owner_id: "usr-1",
+                owner_name: "Alex Mercer",
+                status: "Lead",
+                created_at: new Date().toISOString().slice(0, 16).replace("T", " "),
+                win_probability: 84,
+                churn_risk: "Low",
+                lead_score: 92,
+                lead_tier: "Hot",
+                ai_next_action: "Trigger priority outbound call or calendar booking workflow.",
+                interactions: {
+                  calls_count: 1,
+                  emails_opened: 4,
+                  emails_replied: 2,
+                  website_visits: 8,
+                },
+              };
+              onAddContact(simulatedContact);
+            }}
+            id="btn-simulate-inbound-lead"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/80 hover:bg-indigo-100 dark:hover:bg-indigo-900 border border-indigo-200 dark:border-indigo-800 text-[#3F51B5] dark:text-indigo-300 font-bold text-xs transition-all shadow-xs"
+            title="Simulate Real-Time Inbound Webhook / Lead Capture"
+          >
+            <Zap className="w-3.5 h-3.5 text-amber-500" />
+            <span>Simulate Live Lead</span>
+          </button>
+
           <button
             onClick={() => setSortByScore((prev) => (prev === "desc" ? "asc" : "desc"))}
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs transition-all shadow-xs"

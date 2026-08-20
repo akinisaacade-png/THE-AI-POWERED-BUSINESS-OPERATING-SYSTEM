@@ -166,33 +166,79 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         )}
 
-        {/* Dark/Light Toggle with Sun-to-Moon Rotate Animation */}
-        <motion.button
-          whileTap={{ scale: 0.92 }}
+        {/* Dark/Light Toggle Switch with Animated Sun/Moon Icon Transition */}
+        <button
+          id="dark-mode-toggle-switch"
+          role="switch"
+          aria-checked={darkMode}
+          aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
           onClick={() => setDarkMode((prev) => !prev)}
-          className={`p-2 rounded-lg border text-xs transition-all flex items-center justify-center ${
+          className={`relative flex items-center w-14 h-7.5 px-0.5 rounded-full border transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-[#3F51B5]/50 select-none ${
             darkMode
-              ? "bg-slate-800 border-slate-700 text-amber-400 hover:bg-slate-700"
-              : "bg-slate-100 border-slate-200 text-indigo-600 hover:bg-slate-200"
+              ? "bg-slate-950 border-slate-700 shadow-inner"
+              : "bg-amber-100/80 border-amber-300/80 shadow-xs"
           }`}
-          title="Toggle Theme (or press ? for shortcuts)"
+          title={darkMode ? "Switch to Light Mode (Sun)" : "Switch to Dark Mode (Moon)"}
         >
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              key={darkMode ? "sun-icon" : "moon-icon"}
-              initial={{ rotate: -90, scale: 0.5, opacity: 0 }}
-              animate={{ rotate: 0, scale: 1, opacity: 1 }}
-              exit={{ rotate: 90, scale: 0.5, opacity: 0 }}
-              transition={{ duration: 0.28, ease: "easeInOut" }}
+          {/* Background Ambient Decor (Day Clouds / Night Stars) */}
+          <div className="absolute inset-0 flex items-center justify-between px-1.5 pointer-events-none overflow-hidden rounded-full">
+            <span
+              className={`text-[9px] transition-opacity duration-300 ${
+                darkMode ? "opacity-90 text-amber-200" : "opacity-0"
+              }`}
             >
+              ✦
+            </span>
+            <span
+              className={`text-[8px] transition-opacity duration-300 ${
+                darkMode ? "opacity-0" : "opacity-75 text-amber-500 font-bold"
+              }`}
+            >
+              ☼
+            </span>
+          </div>
+
+          {/* Sliding Animated Thumb with Sun/Moon Icon Transition */}
+          <motion.div
+            layout
+            transition={{
+              type: "spring",
+              stiffness: 500,
+              damping: 30,
+            }}
+            className={`flex items-center justify-center w-6.5 h-6.5 rounded-full shadow-md z-10 transition-colors duration-300 ${
+              darkMode
+                ? "ml-auto bg-slate-800 text-indigo-300 border border-slate-600 shadow-indigo-900/40"
+                : "mr-auto bg-white text-amber-500 border border-amber-200 shadow-amber-500/20"
+            }`}
+          >
+            <AnimatePresence mode="wait" initial={false}>
               {darkMode ? (
-                <Sun className="w-4 h-4 text-amber-400" />
+                <motion.div
+                  key="dark-moon"
+                  initial={{ rotate: -90, scale: 0.2, opacity: 0 }}
+                  animate={{ rotate: 0, scale: 1, opacity: 1 }}
+                  exit={{ rotate: 90, scale: 0.2, opacity: 0 }}
+                  transition={{ duration: 0.22, ease: "easeOut" }}
+                  className="flex items-center justify-center"
+                >
+                  <Moon className="w-3.5 h-3.5 fill-indigo-400/30 text-indigo-300" />
+                </motion.div>
               ) : (
-                <Moon className="w-4 h-4 text-indigo-600" />
+                <motion.div
+                  key="light-sun"
+                  initial={{ rotate: 90, scale: 0.2, opacity: 0 }}
+                  animate={{ rotate: 0, scale: 1, opacity: 1 }}
+                  exit={{ rotate: -90, scale: 0.2, opacity: 0 }}
+                  transition={{ duration: 0.22, ease: "easeOut" }}
+                  className="flex items-center justify-center"
+                >
+                  <Sun className="w-3.5 h-3.5 fill-amber-400/40 text-amber-500 animate-spin-slow" />
+                </motion.div>
               )}
-            </motion.div>
-          </AnimatePresence>
-        </motion.button>
+            </AnimatePresence>
+          </motion.div>
+        </button>
 
         {/* User Profile & Subscription / Billing Quick Access */}
         <button

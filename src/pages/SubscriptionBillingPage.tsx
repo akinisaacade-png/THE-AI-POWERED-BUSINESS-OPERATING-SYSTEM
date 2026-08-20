@@ -123,9 +123,7 @@ export const SubscriptionBillingPage: React.FC<SubscriptionBillingPageProps> = (
       }
 
       // Render Monthly Plan Button
-      const monthlyTarget =
-        document.getElementById("paypal-button-container-monthly") ||
-        document.getElementById("paypal-button-container-P-1N2589523E589180VNKDHMWA");
+      const monthlyTarget = document.getElementById("paypal-button-container-monthly");
       if (monthlyTarget && !monthlyTarget.hasChildNodes()) {
         try {
           window.paypal
@@ -174,9 +172,7 @@ export const SubscriptionBillingPage: React.FC<SubscriptionBillingPageProps> = (
       }
 
       // Render Yearly Plan Button
-      const yearlyTarget =
-        document.getElementById("paypal-button-container-yearly") ||
-        document.getElementById("paypal-button-container-P-57E70186GM393543WNKDHPOQ");
+      const yearlyTarget = document.getElementById("paypal-button-container-yearly");
       if (yearlyTarget && !yearlyTarget.hasChildNodes()) {
         try {
           window.paypal
@@ -1054,8 +1050,12 @@ export const SubscriptionBillingPage: React.FC<SubscriptionBillingPageProps> = (
                 <span className="text-xs font-bold text-slate-400">/ month</span>
               </div>
 
-              <div className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 text-[11px] font-mono text-slate-500 dark:text-slate-400">
-                PayPal Plan ID: <span className="font-bold text-[#3F51B5] dark:text-indigo-300">P-1N2589523E589180VNKDHMWA</span>
+              <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 text-[11px] text-slate-600 dark:text-slate-300 flex items-center justify-between">
+                <span className="font-semibold">Plan Protection:</span>
+                <span className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  Secure Verified Tier
+                </span>
               </div>
 
               <p className="text-xs text-slate-600 dark:text-slate-300">
@@ -1142,8 +1142,12 @@ export const SubscriptionBillingPage: React.FC<SubscriptionBillingPageProps> = (
                 </span>
               </div>
 
-              <div className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 text-[11px] font-mono text-slate-500 dark:text-slate-400">
-                PayPal Plan ID: <span className="font-bold text-[#FF9800]">P-57E70186GM393543WNKDHPOQ</span>
+              <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 text-[11px] text-slate-600 dark:text-slate-300 flex items-center justify-between">
+                <span className="font-semibold">Plan Protection:</span>
+                <span className="font-bold text-[#FF9800] flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  Enterprise Tier Active
+                </span>
               </div>
 
               <p className="text-xs text-slate-600 dark:text-slate-300">
@@ -1223,22 +1227,22 @@ export const SubscriptionBillingPage: React.FC<SubscriptionBillingPageProps> = (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-4 text-xs font-mono">
           <div className="p-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
             <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-sans">
-              Monthly Plan ID ($29.99/mo)
+              Monthly Subscription Tier
             </span>
-            <span className="font-bold text-[#3F51B5] dark:text-indigo-400 text-xs break-all">
-              {paypalConfig.monthlyPlanId}
+            <span className="font-bold text-[#3F51B5] dark:text-indigo-400 text-xs break-all font-sans">
+              Growth Monthly ($29.99/mo)
             </span>
-            <div className="text-[10px] text-slate-500 mt-1 font-sans">Recurring 30-Day Billing Cycle</div>
+            <div className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1 font-sans">Protected &amp; Encrypted ✓</div>
           </div>
 
           <div className="p-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
             <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-sans">
-              Yearly Plan ID ($299.99/yr)
+              Yearly Subscription Tier
             </span>
-            <span className="font-bold text-[#FF9800] text-xs break-all">
-              {paypalConfig.yearlyPlanId}
+            <span className="font-bold text-[#FF9800] text-xs break-all font-sans">
+              VIP Enterprise ($299.99/yr)
             </span>
-            <div className="text-[10px] text-slate-500 mt-1 font-sans">Recurring 365-Day Billing Cycle (2 Mo Free)</div>
+            <div className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1 font-sans">Protected &amp; Encrypted ✓</div>
           </div>
 
           <div className="p-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
@@ -1331,11 +1335,11 @@ export const SubscriptionBillingPage: React.FC<SubscriptionBillingPageProps> = (
                     </div>
 
                     <div className="flex justify-between items-center text-xs">
-                      <span className="text-slate-500 dark:text-slate-400">PayPal Plan ID:</span>
-                      <span className="font-mono font-bold text-[#3F51B5] dark:text-indigo-300">
+                      <span className="text-slate-500 dark:text-slate-400">Billing Term:</span>
+                      <span className="font-semibold text-slate-800 dark:text-slate-200">
                         {selectedPlanForCheckout === "monthly"
-                          ? paypalConfig.monthlyPlanId
-                          : paypalConfig.yearlyPlanId}
+                          ? "30-Day Recurring Cycle"
+                          : "Annual Recurring (2 Months Free)"}
                       </span>
                     </div>
 
@@ -1427,9 +1431,9 @@ export const SubscriptionBillingPage: React.FC<SubscriptionBillingPageProps> = (
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-400">Plan ID:</span>
+                      <span className="text-slate-400">Plan Tier:</span>
                       <span className="font-bold text-[#FF9800]">
-                        {paymentSuccessReceipt.planId}
+                        {paymentSuccessReceipt.planType === "yearly" ? "VIP Enterprise (Annual)" : "Growth Monthly Pro"}
                       </span>
                     </div>
                     <div className="flex justify-between">

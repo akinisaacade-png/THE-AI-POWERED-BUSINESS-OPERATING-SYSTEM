@@ -367,3 +367,39 @@ export interface UserSession {
   subscription: UserSubscription;
   isSubscribed?: boolean;
 }
+
+export type ToastType =
+  | "lead_added"
+  | "deal_stage_changed"
+  | "deal_added"
+  | "success"
+  | "info"
+  | "warning"
+  | "error";
+
+export interface ToastNotification {
+  id: string;
+  type: ToastType;
+  title: string;
+  message: string;
+  timestamp: string;
+  leadData?: {
+    name: string;
+    company?: string;
+    source?: string;
+    score?: number;
+    email?: string;
+  };
+  dealData?: {
+    dealId?: string;
+    title: string;
+    value: number;
+    fromStage?: PipelineStage;
+    toStage: PipelineStage;
+    contactName?: string;
+    companyName?: string;
+  };
+  actionLabel?: string;
+  onAction?: () => void;
+  durationMs?: number;
+}

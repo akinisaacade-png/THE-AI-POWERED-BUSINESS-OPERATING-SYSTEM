@@ -85,7 +85,46 @@ export const CrmPipelinePage: React.FC<CrmPipelinePageProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={() => {
+              // Find an active un-won deal to advance to the next stage or won
+              const stageOrder: Deal["stage"][] = ["new_lead", "qualified", "proposal", "negotiation", "won"];
+              const advanceableDeal = deals.find((d) => d.stage !== "won" && d.stage !== "lost") || deals[0];
+
+              if (advanceableDeal) {
+                const currentIdx = stageOrder.indexOf(advanceableDeal.stage);
+                const nextStage = stageOrder[Math.min(currentIdx + 1, stageOrder.length - 1)];
+                onUpdateDeal(advanceableDeal.id, {
+                  stage: nextStage,
+                  probability: nextStage === "won" ? 100 : Math.min((advanceableDeal.probability || 50) + 15, 95),
+                });
+              } else {
+                // If all won, add a new deal to trigger stage transition
+                const idSuffix = Date.now().toString().slice(-4);
+                const newD: Deal = {
+                  id: `deal-${idSuffix}`,
+                  contact_id: `cnt-${idSuffix}`,
+                  contact_name: "Sarah Jenkins",
+                  company_name: "Nexus Cloud AI",
+                  title: "Nexus Cloud - Enterprise SaaS License",
+                  value: 38500,
+                  stage: "negotiation",
+                  close_date: new Date().toISOString().slice(0, 10),
+                  probability: 85,
+                  owner_name: "Alex Mercer",
+                };
+                onAddDeal(newD);
+              }
+            }}
+            id="btn-simulate-deal-stage-move"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-purple-50 dark:bg-purple-950/80 hover:bg-purple-100 dark:hover:bg-purple-900 border border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300 font-bold text-xs transition-all shadow-xs"
+            title="Simulate Real-Time Deal Stage Change / Close Won"
+          >
+            <TrendingUp className="w-3.5 h-3.5 text-purple-500" />
+            <span>Simulate Stage Move</span>
+          </button>
+
           <div className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold">
             Total Pipeline: <span className="text-[#3F51B5] dark:text-indigo-400 font-mono">${(totalPipelineVal ?? 0).toLocaleString()}</span>
           </div>

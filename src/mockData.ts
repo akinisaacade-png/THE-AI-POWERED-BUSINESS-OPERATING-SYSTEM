@@ -677,7 +677,7 @@ export const initialPayments: Payment[] = [
     method: "PayPal",
     invoice_number: "INV-PP-2026-0104",
     date: "2026-08-17",
-    plan: "Yearly VIP Enterprise (P-57E70186GM393543WNKDHPOQ)"
+    plan: "Yearly VIP Enterprise"
   },
   {
     id: "pay-903",
@@ -689,7 +689,7 @@ export const initialPayments: Payment[] = [
     method: "PayPal",
     invoice_number: "INV-PP-2026-0105",
     date: "2026-08-19",
-    plan: "Monthly Pro Subscription (P-1N2589523E589180VNKDHMWA)"
+    plan: "Monthly Pro Subscription"
   },
   {
     id: "pay-904",
