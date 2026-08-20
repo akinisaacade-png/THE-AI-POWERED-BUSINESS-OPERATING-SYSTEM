@@ -44,6 +44,10 @@ export const DataManagementModal: React.FC<DataManagementModalProps> = ({
   const [customNotes, setCustomNotes] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
 
+  React.useEffect(() => {
+    if (activeSection) setSection(activeSection);
+  }, [activeSection, isOpen]);
+
   if (!isOpen) return null;
 
   const handleCreateRecord = (e: React.FormEvent) => {

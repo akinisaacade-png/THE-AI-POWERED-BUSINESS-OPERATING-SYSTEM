@@ -349,6 +349,9 @@ export default function App() {
               onDownloadPdf={handleDownloadPdf}
               onExportCsv={handleExportCsv}
               darkMode={darkMode}
+              onAddContact={handleAddContact}
+              onAddDeal={handleAddDeal}
+              onAddCall={handleAddCall}
             />
           )}
 

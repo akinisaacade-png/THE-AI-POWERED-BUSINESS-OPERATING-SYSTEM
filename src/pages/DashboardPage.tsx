@@ -31,6 +31,8 @@ import {
 } from "lucide-react";
 import { MetricCards } from "../components/MetricCards";
 import { PredictiveRevenueForecast } from "../components/PredictiveRevenueForecast";
+import { RevenueGrowthLineChart } from "../components/RevenueGrowthLineChart";
+import { QuickAddFab } from "../components/QuickAddFab";
 import { Deal, CallLog, Review, Campaign, AutomationWorkflow, Booking } from "../types";
 import { useSubscription } from "../context/SubscriptionContext";
 
@@ -47,6 +49,9 @@ interface DashboardPageProps {
   onDownloadPdf: () => void;
   onExportCsv: () => void;
   darkMode?: boolean;
+  onAddContact?: (contact: any) => void;
+  onAddDeal?: (deal: any) => void;
+  onAddCall?: (call: any) => void;
 }
 
 interface MonthlyTargets {
@@ -85,6 +90,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   onDownloadPdf,
   onExportCsv,
   darkMode = false,
+  onAddContact,
+  onAddDeal,
+  onAddCall,
 }) => {
   const [appliedFix, setAppliedFix] = useState(false);
   const [isEditingTargets, setIsEditingTargets] = useState(false);
@@ -600,6 +608,20 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         </div>
       </motion.div>
 
+      {/* 2.7 Monthly Revenue Growth Trends (Actual vs Projected Line Chart) */}
+      <motion.div
+        variants={sectionVariants}
+        initial="hidden"
+        animate="visible"
+        custom={1.7}
+      >
+        <RevenueGrowthLineChart
+          deals={deals}
+          darkMode={darkMode}
+          onNavigate={onNavigate}
+        />
+      </motion.div>
+
       {/* 2.8 Predictive Revenue Forecasting & Conversion Trajectory */}
       <motion.div
         variants={sectionVariants}
@@ -801,6 +823,15 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           </div>
         </motion.div>
       </motion.div>
+
+      {/* 5. Quick Add Floating Action Button (Bottom-Right) */}
+      <QuickAddFab
+        darkMode={darkMode}
+        onOpenDataModal={onOpenDataModal}
+        onAddContact={onAddContact}
+        onAddDeal={onAddDeal}
+        onAddCall={onAddCall}
+      />
     </section>
   );
 };
