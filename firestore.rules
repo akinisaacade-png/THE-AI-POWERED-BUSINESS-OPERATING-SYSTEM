@@ -1,0 +1,50 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // User profile documents
+    match /users/{userId} {
+      allow read, write: if true;
+    }
+    
+    // Pipeline deals
+    match /deals/{dealId} {
+      allow read, write: if true;
+    }
+    
+    // Automation workflows
+    match /workflows/{workflowId} {
+      allow read, write: if true;
+    }
+
+    // Call logs
+    match /call_logs/{logId} {
+      allow read, write: if true;
+    }
+
+    // Reviews & Reputation
+    match /reviews/{reviewId} {
+      allow read, write: if true;
+    }
+
+    // Campaigns
+    match /campaigns/{campaignId} {
+      allow read, write: if true;
+    }
+    
+    // Bookings & Appointments
+    match /bookings/{bookingId} {
+      allow read, write: if true;
+    }
+
+    // Subscriptions
+    match /subscriptions/{subscriptionId} {
+      allow read, write: if true;
+    }
+
+    // Fallback collection match
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}

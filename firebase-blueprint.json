@@ -1,0 +1,97 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "type": "object",
+      "description": "User profile, account details, and subscription state",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "member", "owner"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "trialStartDate": { "type": "string", "format": "date-time" },
+        "trialExpiresDate": { "type": "string", "format": "date-time" },
+        "subscription": {
+          "type": "object",
+          "properties": {
+            "status": { "type": "string", "enum": ["trial_active", "trial_expired", "subscription_active", "subscription_cancelled", "subscription_suspended"] },
+            "plan": { "type": "string", "enum": ["monthly", "yearly", "custom"] },
+            "planId": { "type": "string" },
+            "amount": { "type": "number" },
+            "paypalSubscriptionId": { "type": "string" },
+            "lastPaymentDate": { "type": "string", "format": "date-time" },
+            "nextBillingDate": { "type": "string", "format": "date-time" }
+          }
+        }
+      },
+      "required": ["id", "email"]
+    },
+    "Deal": {
+      "title": "Deal",
+      "type": "object",
+      "description": "Sales pipeline deal item",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "contactName": { "type": "string" },
+        "company": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "value": { "type": "number" },
+        "stage": { "type": "string" },
+        "priority": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "title", "value", "stage"]
+    },
+    "Workflow": {
+      "title": "Workflow",
+      "type": "object",
+      "description": "Automated workflow sequence",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "triggerType": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "paused", "draft"] },
+        "executionCount": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "title", "triggerType", "status"]
+    },
+    "Booking": {
+      "title": "Booking",
+      "type": "object",
+      "description": "Customer calendar booking",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "customerName": { "type": "string" },
+        "email": { "type": "string" },
+        "date": { "type": "string" },
+        "time": { "type": "string" },
+        "status": { "type": "string" }
+      },
+      "required": ["id", "customerName", "date", "time"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Stores user account information and subscription status."
+    },
+    "/deals/{dealId}": {
+      "schema": "Deal",
+      "description": "Stores sales pipeline deals and opportunities."
+    },
+    "/workflows/{workflowId}": {
+      "schema": "Workflow",
+      "description": "Stores automated workflows and agent trigger rules."
+    },
+    "/bookings/{bookingId}": {
+      "schema": "Booking",
+      "description": "Stores customer bookings and appointments."
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "THE AI-POWERED BUSINESS OPERATING SYSTEM",
+  "description": "End-to-end AI-powered revenue OS—capture, nurture, close, retain, and re-engage customers.",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
+
