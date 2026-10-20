@@ -110,6 +110,110 @@ Provide an immediate, ultra-crisp, high-converting result. Keep it under 3 sente
   }
 });
 
+// Automated AI Lead Scoring endpoint (0-100% purchase probability based on interaction history & engagement metrics)
+app.post("/api/ai/lead-score", async (req: Request, res: Response) => {
+  try {
+    const { contact } = req.body;
+    if (!contact) {
+      return res.status(400).json({ error: "Contact data is required" });
+    }
+
+    const interactions = contact.interactions || {};
+    const callsCount = Number(interactions.calls_count ?? 1);
+    const emailsOpened = Number(interactions.emails_opened ?? 3);
+    const emailsReplied = Number(interactions.emails_replied ?? 1);
+    const websiteVisits = Number(interactions.website_visits ?? 4);
+    const formSubmissions = Number(interactions.form_submissions ?? 1);
+    const lastPage = interactions.last_visited_page || "";
+
+    // 1. Call Interaction Velocity (up to 30 pts)
+    const callsScore = Math.min(callsCount * 8, 30);
+
+    // 2. Email Engagement Intensity (up to 25 pts)
+    const emailsScore = Math.min(emailsOpened * 2 + emailsReplied * 6, 25);
+
+    // 3. Web Telemetry & Intent URL (up to 25 pts)
+    let webScore = Math.min(websiteVisits * 2.5, 17);
+    if (lastPage.includes("pricing") || lastPage.includes("proposals") || lastPage.includes("demo")) {
+      webScore += 8;
+    }
+    webScore = Math.min(Math.round(webScore), 25);
+
+    // 4. Intent Profile & Status Signals (up to 20 pts)
+    let profileScore = 0;
+    const tags = Array.isArray(contact.tags) ? contact.tags : [];
+    if (tags.some((t: string) => /enterprise|decision maker|vip/i.test(t))) profileScore += 10;
+    if (tags.some((t: string) => /high-intent|hot lead/i.test(t))) profileScore += 6;
+    if (contact.status === "Customer" || contact.status === "Active") profileScore += 4;
+    profileScore = Math.min(profileScore, 20);
+
+    const calculatedProbability = Math.min(Math.max(Math.round(callsScore + emailsScore + webScore + profileScore), 8), 99);
+    const tier = calculatedProbability >= 80 ? "Hot" : calculatedProbability >= 50 ? "Warm" : "Cold";
+
+    let aiReasoning = `${tier} lead with ${calculatedProbability}% purchase probability. Driven by ${callsCount} call(s), ${emailsReplied} email response(s), and ${websiteVisits} site visit(s).`;
+    let recommendedAction = tier === "Hot"
+      ? "Deploy immediate executive demo booking or tailored pricing proposal."
+      : tier === "Warm"
+      ? "Nurture with case studies and interactive ROI calculator via email/SMS."
+      : "Enroll in low-touch automated re-engagement drip sequence.";
+
+    const ai = getGeminiClient();
+    if (ai) {
+      try {
+        const aiPrompt = `Evaluate buyer purchase intent probability (0-100%) for:
+Name: ${contact.name}
+Company: ${contact.company_name || "N/A"}
+Status: ${contact.status}
+Interactions: Calls=${callsCount}, Emails Opened=${emailsOpened}, Emails Replied=${emailsReplied}, Web Visits=${websiteVisits}, Last Page=${lastPage}
+Tags: ${tags.join(", ")}
+Calculated Score: ${calculatedProbability}% (${tier})
+
+Provide a 1-sentence executive reasoning and 1 specific closing action in JSON format: {"reasoning": "...", "recommendation": "..."}`;
+
+        const geminiRes = await ai.models.generateContent({
+          model: "gemini-3.1-flash-lite",
+          contents: aiPrompt,
+          config: {
+            responseMimeType: "application/json",
+            thinkingConfig: { thinkingLevel: ThinkingLevel.MINIMAL },
+          },
+        });
+
+        if (geminiRes.text) {
+          const parsed = JSON.parse(geminiRes.text);
+          if (parsed.reasoning) aiReasoning = parsed.reasoning;
+          if (parsed.recommendation) recommendedAction = parsed.recommendation;
+        }
+      } catch (gemErr) {
+        // Fall back to rule-based reasoning
+      }
+    }
+
+    return res.json({
+      score: calculatedProbability,
+      probability: calculatedProbability,
+      tier,
+      reasoning: aiReasoning,
+      recommendation: recommendedAction,
+      breakdown: {
+        callsScore,
+        emailsScore,
+        webScore,
+        profileScore,
+        callsCount,
+        emailsOpened,
+        emailsReplied,
+        websiteVisits,
+        lastVisitedPage: lastPage,
+        formSubmissions,
+      },
+    });
+  } catch (error: any) {
+    console.error("Lead scoring error:", error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
 // 3. High-Thinking Mode for Complex Strategic Reasoning & Deep Analysis
 app.post("/api/ai/thinking", async (req: Request, res: Response) => {
   try {

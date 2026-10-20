@@ -632,6 +632,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         <PredictiveRevenueForecast
           deals={deals}
           darkMode={darkMode}
+          revenueTarget={targets.revenueTarget}
           onNavigateToDeals={() => onNavigate("crm-pipeline")}
         />
       </motion.div>
